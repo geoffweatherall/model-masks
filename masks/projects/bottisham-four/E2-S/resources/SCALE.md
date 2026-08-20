@@ -44,3 +44,58 @@ since nothing here was resampled.
 E2-S (44-13926) has no distinctive nose art or nickname, so its only unique
 markings are the fuselage code and tail serial above — these are the pieces
 worth tracing precisely for mask work.
+
+## Tail serial: a second, independent calibration
+
+For the tail serial tracing work, the user physically remeasured a specific
+span on the actual model/reference rather than relying on the ruler-in-shot
+calibration above: **left edge of "4" to right edge of "6" = 18.8mm
+(given/canonical)**. In `decal-tail-serial-413926.png`'s own pixel space
+that span measures 453px, giving **24.0957 px/mm** for this specific crop.
+
+This is ~1% different from the 23.858 px/mm derived from the ruler photo
+above — both crops come from the same underlying scan, so in principle they
+should agree exactly; the ~1% gap is ordinary measurement tolerance (ruler
+reading vs. calipers/digital measurement on the physical model). Per the
+user's instruction, the freshly-given physical measurement is treated as
+canonical for whatever it was given for — so all three tail-serial SVGs
+below use 24.0957 px/mm, not the ruler-derived figure. Don't assume the two
+figures are interchangeable across files in this folder; check which
+calibration a given SVG was actually built from (recorded in this file).
+
+## Tail serial: hand-built regularization attempt (abandoned)
+
+First attempt at cleaning up `tail-serial-413926-traced.svg` (potrace) was
+two hand-built alternatives: Approach A (every digit's centerline
+hand-designed from scratch - lines and curves - then buffered to an exact
+constant stroke width via `shapely`) and Approach B (a targeted hybrid,
+swapping in Approach A's geometry only for "4" and "3", the two digits with
+confirmed defects, keeping the rest as dense OpenCV traces of the scan).
+
+**User feedback: both were a poor match, worse than the original trace.**
+Abandoned rather than iterated further. Deleted along with their build
+scripts (`build_digit_*.py`, `build_serial_approach_{a,b}.py`,
+`regularize_serial_lib.py`) - don't recreate this approach for future
+digit/letter regularization without a good reason; hand-designing font-like
+curves from visual judgement alone did not work well here.
+
+## Tail serial: built from usaaf-serial-stencil.ttf (current approach)
+
+**`tail-serial-413926-font.svg`** — the font `fonts/usaaf-serial-stencil.ttf`
+already has clean, correctly-designed stencil digits (constant stroke width,
+proper gaps, by construction) - using it directly was a far better result
+than hand-building geometry. Reuses the calibration and sizing already
+established: canonical height 4.07mm (calculated, same as the traced.svg),
+24.0957 px/mm, per-digit widths matching the scan (aspect-corrected per
+digit, same method as the E2/S fuselage-code work), and the measured 1.37mm
+inter-digit gap. Script: `scripts/build_serial_from_font.py`.
+
+Note for reuse: font glyphs with disconnected pieces or counters (e.g. "3",
+"9", "6") emit **multiple subpaths** (separate `M...Z` segments) per glyph -
+treating a glyph's path data as one continuous polygon (as an earlier
+version of this script did, and as `scripts/generate-e2-s-svgs.py` did
+before it, for the "S" bug) puts a spurious line across the shape. Split on
+each `M` into its own subpath and emit them as separate `M...Z` runs within
+the same `<path d="...">` - relies on the font's own subpath winding
+direction for holes to render correctly via the default nonzero fill-rule.
+
