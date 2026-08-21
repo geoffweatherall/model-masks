@@ -1,0 +1,12 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!--US Roundel blue outline-->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="1270" height="700">
+<!--outer blue bar and disk-->
+<circle fill="#1a1e3b" cx="635" cy="350" r="337.5"/>
+<rect fill="#1a1e3b" x="12.5" y="219.8" width="1245" height="225"/>
+<!--white bar-->
+<rect fill="#ffffff" x="50" y="257.3" width="1170" height="150"/>
+<circle fill="#1a1e3b" cx="635" cy="350" r="300"/>
+<!--white star-->
+<polygon fill="#ffffff" points="635,50 702.35,257.3 920,257.3 744,385.4 811,592.7 635,464.6 455,592.7 526,385.4 350,257.3 567.65,257.3 "/>
+</svg>
