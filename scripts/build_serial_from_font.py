@@ -12,7 +12,9 @@ from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.boundsPen import BoundsPen
 
 REPO = "/home/geoff/Projects/model-masks-workspace/model-masks"
-FONT_PATH = f"{REPO}/fonts/usaaf-serial-stencil.ttf"
+# usaaf-serial-stencil.ttf is "free for personal use" (not clearly open), so
+# it lives in the private sibling repo, not this one - see model-masks/CLAUDE.md
+FONT_PATH = "/home/geoff/Projects/model-masks-workspace/model-fonts/fonts-proprietary/usaaf-serial-stencil.ttf"
 OUT_SVG = f"{REPO}/masks/projects/bottisham-four/E2-S/svg/tail-serial-413926-font.svg"
 
 H = 4.07          # canonical digit height (calculated earlier from the 18.8mm calibration)

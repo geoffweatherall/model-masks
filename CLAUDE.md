@@ -40,8 +40,9 @@ the user's real machine, so anything installed there (apt packages, fonts via
   proactively suggest tools that would help (better Python, useful CLI
   utilities, etc.) rather than waiting to be asked.
 - **Inkscape** (installed 2026-08-20, v1.4.3) works both headful (normal GUI,
-  picks up fonts via the `~/.local/share/fonts/model-masks` symlink — see
-  Fonts section) and headless via CLI (`inkscape in.svg --export-type=png
+  picks up fonts via the `~/.local/share/fonts/model-fonts-proprietary` (and,
+  once it exists, `model-masks`) symlink(s) — see Fonts section) and
+  headless via CLI (`inkscape in.svg --export-type=png
   --export-filename=out.png`, or `--actions=...` for scripted path ops) —
   confirmed working even with `DISPLAY`/`WAYLAND_DISPLAY` unset, no Xvfb
   needed.
@@ -58,67 +59,84 @@ the user's real machine, so anything installed there (apt packages, fonts via
   at `/run/media/geoff/9A8832FE8832D909` when booted into Linux (NTFS,
   read-write). Useful for pulling reference material/fonts across.
 
-## Fonts
+## Fonts (split across two repos — read this before adding or looking for any font)
 
-`fonts/` at repo root holds `.ttf` files sourced from the user's Windows
-partition (`for_claude` folder at `/run/media/geoff/9A8832FE8832D909/for_claude`
-when dual-booted into Linux — see gotcha below). Filenames are normalized to
-lowercase-hyphenated, derived from each font's internal `family` metadata
-(via `fc-query`), not the original on-disk filename — those varied wildly in
-case/spacing/relevance. Non-ASCII characters transliterated (ü → ue). File
-permissions are `644` (data files, no execute bit needed). Current set:
+**model-masks will go public; a sibling repo, `model-fonts`, stays private.**
+Font files are split between them by license status, so no copyrighted font
+software ends up in the public repo:
 
-| Filename | Internal family | Notes |
-|---|---|---|
-| `amarillo-usaf.ttf` | AmarilloUSAF | Resolved 2026-08-20 — see below |
-| `blockschrift-fuer-flugzeuge.ttf` | Blockschrift für Flugzeuge | |
-| `raf-ww2-851ath.ttf` | RAF_WW2_851ATH | |
-| `raf-ww2-851ath-gimp.ttf` | RAF_WW2_851ATH_GIMP | |
-| `universj.ttf` | UniversJ | |
-| `usaaf-code-buzz.ttf` | USAAF code | "buzz" kept from original filename — common name for this USAAF buzz-number font |
-| `usaaf-serial-stencil.ttf` | USAAF_Serial_Stencil | |
-| `usaaf-stencil.ttf` | USAAF_Stencil | |
-| `usn-stencil.ttf` | USN_Stencil | |
+- **`fonts-open/`** (this repo) — fonts with a clearly open/permissive
+  license (public domain, SIL OFL, explicit "free for any use including
+  redistribution", etc.). Safe to be public. **Doesn't exist yet** — every
+  font sourced so far turned out not to qualify (see below), so there's
+  nothing to put in it. Create it (`mkdir fonts-open`) the first time a
+  genuinely open-licensed font is actually added.
+- **`../model-fonts/fonts-proprietary/`** (sibling repo, private, expected
+  to already be cloned alongside this one at
+  `/home/geoff/Projects/model-masks-workspace/model-fonts`) — everything
+  else: shareware, "personal use only", "all rights reserved" with no
+  redistribution grant, or no license info found at all. **When unsure,
+  it goes here, not in `fonts-open/`** — that's a deliberate standing rule
+  from the user, not a one-off judgment call.
 
-**Resolved (2026-08-20): AmarilloUSAF font search.** The font was not
-missing — it was already present in `for_claude` all along, saved under the
-unrelated filename `amarurgt.ttf` (likely the foundry's original distribution
-filename; foundry tag `TLnt`). Confirmed by: (1) `fc-query` showing
-family/fullname/postscriptname all reading "AmarilloUSAF", and (2) extracting
-glyph outlines with fontTools and diffing them byte-for-byte against
-`AmarilloUSAF_glyph_data.json` (pre-extracted by a prior browser-Claude
-session, found in `Downloads/` on the Windows partition) — exact match on
-path data and advance widths for every glyph checked. Copied into this repo
-as `fonts/amarillo-usaf.ttf`. The glyph-data JSON/txt files on the Windows
-partition are now redundant (the actual font file supersedes them) but
-haven't been deleted from there — user's call if they want to clean those up.
+**When looking for a font to use, check both directories.** When adding a
+new font, check its license (embedded `name` table via fontTools — IDs 0
+Copyright, 13 License, 14 LicenseURL are usually the most direct — plus a
+web search if those are empty/ambiguous) and place it accordingly. See
+`model-fonts/README.md` for the full rationale and a per-font license table.
 
-**Installing fonts for local use (per machine, not git-synced):** the
-`fonts/` directory itself is git-tracked, but registering it with the OS font
-system is a per-machine step that lives outside the repo, so it must be
-redone on each machine after a fresh clone/pull. Run:
+Filenames are normalized to lowercase-hyphenated, derived from each font's
+internal `family` metadata (via `fc-query`), not the original filename —
+those varied wildly in case/spacing/relevance. Non-ASCII characters
+transliterated (ü → ue). File permissions `644` (data, no execute bit).
+
+**Resolved (2026-08-20): AmarilloUSAF font search.** The font wasn't
+missing — it was in the user's Windows-partition `for_claude` folder all
+along, saved under the unrelated filename `amarurgt.ttf`. Confirmed via
+`fc-query` (family/fullname/postscriptname all "AmarilloUSAF") and by
+diffing extracted glyph outlines byte-for-byte against a prior
+browser-Claude session's pre-extracted `AmarilloUSAF_glyph_data.json`
+(found in `Downloads/` on the Windows partition, now redundant). Turned out
+to be registered shareware (see license table in `model-fonts/README.md`),
+so it now lives in `model-fonts/fonts-proprietary/amarillo-usaf.ttf`, not
+here.
+
+**Installing fonts for local use (per machine, not git-synced):** registering
+fonts with the OS font system is a per-machine step outside both repos, and
+must be redone on each machine after a fresh clone/pull. Run, once
+`model-fonts` is cloned as a sibling of this repo:
 
 ```
 mkdir -p ~/.local/share/fonts
-ln -sfn "$(pwd)/fonts" ~/.local/share/fonts/model-masks   # run from repo root
+ln -sfn "$(pwd)/../model-fonts/fonts-proprietary" ~/.local/share/fonts/model-fonts-proprietary   # run from this repo's root
 fc-cache -f ~/.local/share/fonts
 ```
 
+(Add `ln -sfn "$(pwd)/fonts-open" ~/.local/share/fonts/model-masks` too, once
+`fonts-open/` actually exists and has something in it.)
+
 Verify with `fc-list | grep -iE "amarillo|blockschrift|raf_ww2|universj|usaaf|usn_stencil"`
-— should list all 9. No root needed. This makes the fonts visible both to
-fontconfig-based headless tooling and to Inkscape's GUI font picker (restart
-Inkscape if it was already open). Symlinking rather than copying means
-future additions to `fonts/` are picked up with just another `fc-cache -f`,
-no re-copying.
+— should list all 8 (all currently live in the proprietary/private set).
+No root needed. This makes the fonts visible both to fontconfig-based
+headless tooling and to Inkscape's GUI font picker (restart Inkscape if it
+was already open) — registering the proprietary fonts locally like this is
+fine, since it's a private, per-machine, non-distributed use; it's
+committing them into the *public* repo that must be avoided. Symlinking
+rather than copying means future additions to either `fonts-open/` or
+`fonts-proprietary/` are picked up with just another `fc-cache -f`.
 
 ## Setup checklist for a new machine (Claude: run this at the start of a
 ## session if things look uninitialized — no .venv, no fonts symlink, etc.)
 
 1. `./scripts/setup-venv.sh` — Python venv + fonttools.
-2. Font symlink + `fc-cache -f` per the font-install steps above.
-3. Inkscape — check `inkscape --version`; if missing, it needs `sudo apt
+2. Check `model-fonts` is cloned as a sibling repo (`../model-fonts` from
+   this repo's root) — it holds the proprietary/unclear-license fonts and
+   is private, so it won't come along with a public clone of this repo. If
+   missing, ask the user rather than guessing a clone URL.
+3. Font symlink(s) + `fc-cache -f` per the font-install steps above.
+4. Inkscape — check `inkscape --version`; if missing, it needs `sudo apt
    install inkscape` (see README's software table), which needs the user to
    run it (Claude has no root — see gotcha above). Ask the user rather than
    attempting sudo.
-4. Repo may have uncommitted changes carried over via git — check `git
+5. Repo may have uncommitted changes carried over via git — check `git
    status` before assuming a clean tree.

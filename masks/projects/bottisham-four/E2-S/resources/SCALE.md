@@ -81,10 +81,12 @@ curves from visual judgement alone did not work well here.
 
 ## Tail serial: built from usaaf-serial-stencil.ttf (current approach)
 
-**`tail-serial-413926-font.svg`** — the font `fonts/usaaf-serial-stencil.ttf`
-already has clean, correctly-designed stencil digits (constant stroke width,
-proper gaps, by construction) - using it directly was a far better result
-than hand-building geometry. Reuses the calibration and sizing already
+**`tail-serial-413926-font.svg`** — the font `usaaf-serial-stencil.ttf`
+(now in the private `model-fonts` sibling repo's `fonts-proprietary/` -
+"free for personal use" only, not clearly open, see `model-masks/CLAUDE.md`)
+already has clean, correctly-designed stencil digits (constant stroke
+width, proper gaps, by construction) - using it directly was a far better
+result than hand-building geometry. Reuses the calibration and sizing already
 established: canonical height 4.07mm (calculated, same as the traced.svg),
 24.0957 px/mm, per-digit widths matching the scan (aspect-corrected per
 digit, same method as the E2/S fuselage-code work), and the measured 1.37mm

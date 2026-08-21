@@ -25,9 +25,19 @@ Run `./scripts/setup-venv.sh` once per machine to set up the Python venv.
 
 ## Fonts
 
-Font files (`.ttf`) may be checked into the repo. For scripted glyph-to-path
-extraction, they're loaded directly by file path (no OS install needed). For
-using them interactively in Inkscape, they need to be registered at the user
-level (`~/.local/share/fonts`, then `fc-cache -f`) — no root required. Cut
-files that use text should have it converted to outlined paths before being
-treated as final, so the deliverable SVG has no font dependency at cut time.
+This repo is public, so font files here are limited to `fonts-open/` —
+clearly open/permissively-licensed fonts only (public domain, SIL OFL,
+explicit free-for-redistribution, etc.). Fonts with an unclear, shareware,
+or "personal use only" license live instead in the private sibling repo
+[model-fonts](https://github.com/geoffweatherall/model-fonts), so no
+copyrighted font software is exposed publicly — see that repo's README for
+the license reasoning and a per-font breakdown.
+
+For scripted glyph-to-path extraction, fonts are loaded directly by file
+path from wherever they live (no OS install needed). For using them
+interactively in Inkscape, they need to be registered at the user level
+(`~/.local/share/fonts`, then `fc-cache -f`) — no root required; see
+CLAUDE.md for the exact symlink commands. Cut files that use text should
+have it converted to outlined paths before being treated as final, so the
+deliverable SVG has no font dependency (and no licensing entanglement) at
+cut time.
